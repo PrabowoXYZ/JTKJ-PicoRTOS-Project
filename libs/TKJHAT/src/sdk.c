@@ -541,7 +541,7 @@ uint32_t veml6030_read_light() {
     //            The i2c that you must use is i2c_default.  
     //            from the sensor. Make necessary bitwise operation to store the results in a register of 16 bits.
     //            Multiply the value by the adequate value considering Integration Time of 100 ms and Gain of 1/8
-    //            using data of page 5 of VEML6030 datasheet.
+    //            using data of page 5 of VEML6030 design application document: https://www.vishay.com/docs/84367/designingveml6030.pdf
     //            Finally, store the value in the variable luxVal_uncorrected.
     //
     // Tehtävä 2: Saadaksemme luminanssin meidän tulee lukea VEML6030_ALS_REG -rekisterin arvo (katso VEML6030-datalehti).
@@ -551,7 +551,7 @@ uint32_t veml6030_read_light() {
     //            Käytettävä i2c-väylä on i2c_default.
     //            Tee tarvittavat bittikohtaiset operaatiot tallettaksesi tuloksen 16-bittiseen rekisteriin.
     //            Kerro arvo sopivalla kertoimella huomioiden 100 ms integraatioaika ja vahvistus 1/8
-    //            käyttäen VEML6030-datalehden sivun 5 tietoja.
+    //            käyttäen VEML6030-sovellussuunnitteluasiakirjan sivun 5 tietoja:https://www.vishay.com/docs/84367/designingveml6030.pdf
     //            Lopuksi tallenna arvo muuttujaan luxVal_uncorrected.
   
     uint32_t luxVal_uncorrected = 0; 
