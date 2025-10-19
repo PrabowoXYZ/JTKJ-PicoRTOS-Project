@@ -510,6 +510,9 @@ void stop_display() {
 // Programming application: https://www.vishay.com/docs/84367/designingveml6030.pdf
 // Datasheet: https://www.vishay.com/docs/84366/veml6030.pdf
 void init_veml6030() {
+
+
+
     // Configure sensor settings (100ms integration time, gain 1/8, power on)
     //Bit 12:11 = 10 (gain1/8)
     //Bit 9:6 = 0000 (Integration time 100ms)
@@ -527,13 +530,13 @@ void init_veml6030() {
     // Write configuration to sensor
     i2c_write_blocking(i2c_default, VEML6030_I2C_ADDR, config, sizeof(config), false);
     sleep_ms(10);
+
 }
 
 // Read light level from VEML6030
 // Ligt in LUX
 // Note: sampling time should be > IT -> in this case it has been 100ms by defintion. 
 uint32_t veml6030_read_light() {
-
     // Exercise 2: In order to get the luminance we need to read the value of the VEML6030_ALS_REG (see VEML6030 datasheet)
     //            Use functions i2c_write_blocking and i2_read_blocking to collect luminance data.
     //            These functions are found in the Pico SDK:
@@ -553,8 +556,17 @@ uint32_t veml6030_read_light() {
     //            Kerro arvo sopivalla kertoimella huomioiden 100 ms integraatioaika ja vahvistus 1/8
     //            käyttäen VEML6030-sovellussuunnitteluasiakirjan sivun 5 tietoja:https://www.vishay.com/docs/84367/designingveml6030.pdf
     //            Lopuksi tallenna arvo muuttujaan luxVal_uncorrected.
-  
-    uint32_t luxVal_uncorrected = 0; 
+    uint8_t txBuffer[1];
+    uint8_t rxBuffer[2];
+
+    txBuffer[0] = VEML6030_ALS_REG;
+    i2c_write_blocking(i2c_default, VEML6030_I2C_ADDR, txBuffer, 1, true);
+    i2c_read_blocking(i2c_default, VEML6030_I2C_ADDR, rxBuffer, 2, false);
+
+    uint16_t als_data = (rxBuffer[1] << 8) | rxBuffer[0];
+
+
+    uint32_t luxVal_uncorrected = (uint32_t)(als_data * 0.5376f);
     if (luxVal_uncorrected>1000){
         // Polynomial is pulled from pg 10 of the datasheet. 
         // See https://github.com/sparkfun/SparkFun_Ambient_Light_Sensor_Arduino_Library/blob/efde0817bd6857863067bd1653a2cfafe6c68732/src/SparkFun_VEML6030_Ambient_Light_Sensor.cpp#L409
@@ -564,6 +576,8 @@ uint32_t veml6030_read_light() {
                             (1.0023 * luxVal_uncorrected);
         return luxVal;
     }
+    sleep_ms(100);
+
     return  luxVal_uncorrected;
 }
 
